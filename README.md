@@ -53,7 +53,7 @@ For example:
 import ipaddress
 
 from relation.hacluster.common import CRM
-from relation.haclsuter.common import ResourceDescriptor
+from relation.hacluster.common import ResourceDescriptor
 
 class VirtualIP(ResourceDescriptor):
     def __init__(self, vip, nic='eth0'):
