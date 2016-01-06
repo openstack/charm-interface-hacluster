@@ -83,7 +83,7 @@ the code a bit cleaner. The example above can thusly be written as:
 @when('ha.connected')
 def cluster_connected(hacluster):
     resources = CRM()
-    resources.add(VirtualIP('192.168.100.1'))
+    resources.add(VirtualIP('10.0.3.100'))
 
     hacluster.bind_on(iface='eth0', mcastport=4430)
     hacluster.manage_resources(resources)
