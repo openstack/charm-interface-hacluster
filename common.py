@@ -50,7 +50,7 @@ class CRM(dict):
         self['colocations'] = {}
         self['clones'] = {}
         self['locations'] = {}
-        self['init_Services'] = []
+        self['init_services'] = []
         super(CRM, self).__init__(*args, **kwargs)
 
     def primitive(self, name, agent, description=None, **kwargs):
