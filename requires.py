@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import relations.hacluster.common
 from charms.reactive import hook
 from charms.reactive import RelationBase
 from charms.reactive import scopes
@@ -61,5 +62,51 @@ class HAClusterRequires(RelationBase):
 
         """
         relation_data = {k: v for k, v in crm.items() if v}
+        print(relation_data)
         self.set_local(**relation_data)
         self.set_remote(**relation_data)
+
+
+    def bind_resources(self, iface, mcastport=None):
+        """Inform the ha subordinate about each service it should manage. The
+        child class specifies the services via self.ha_resources
+
+        @param hacluster interface
+        """
+        if not mcastport:
+            mcastport=4440
+        resources = self.get_local('resources')
+        self.bind_on(iface=iface, mcastport=mcastport)
+        self.manage_resources(resources)
+
+
+    def add_vip(self, name, vip, iface, netmask):
+        """Add a VirtualIP object for each user specified vip to self.resources
+        """
+        resource_dict = self.get_local('resources')
+        if resource_dict:
+            resources=relations.hacluster.common.CRM(**resource_dict)
+        else:
+            resources=relations.hacluster.common.CRM()
+        resources.add(
+            relations.hacluster.common.VirtualIP(
+                name,
+                vip,
+                nic=iface,
+                cidr=netmask,))
+        self.set_local(resources=resources)
+
+
+    def add_init_service(self, name, service):
+        """Add a InitService object for haproxy to self.resources
+        """
+        resource_dict = self.get_local('resources')
+        if resource_dict:
+            resources=relations.hacluster.common.CRM(**resource_dict)
+        else:
+            resources=relations.hacluster.common.CRM()
+        resources.add(
+            relations.hacluster.common.InitService(
+            name,
+            service,))
+        self.set_local(resources=resources)
