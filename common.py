@@ -14,6 +14,7 @@
 import ipaddress
 from six import string_types
 
+
 class CRM(dict):
     """
     Configuration object for Pacemaker resources for the HACluster
@@ -512,12 +513,24 @@ class ResourceDescriptor(object):
         """
         pass
 
+
 class InitService(ResourceDescriptor):
     def __init__(self, service_name, init_service_name):
+        """Class for managing init resource
+
+        :param service_name: string - Name of service
+        :param init_service_name: string - Name service uses in init system
+        :returns: None
+        """
         self.service_name = service_name
         self.init_service_name = init_service_name
 
     def configure_resource(self, crm):
+        """"Configure new init system service resource in crm
+
+        :param crm: CRM() instance - Config object for Pacemaker resources
+        :returns: None
+        """
         res_key = 'res_{}_{}'.format(
             self.service_name.replace('-', '_'),
             self.init_service_name.replace('-', '_'))
@@ -530,12 +543,25 @@ class InitService(ResourceDescriptor):
 
 class VirtualIP(ResourceDescriptor):
     def __init__(self, service_name, vip, nic=None, cidr=None):
+        """Class for managing VIP resource
+
+        :param service_name: string - Name of service
+        :param vip: string - Virtual IP to be managed
+        :param nic: string - Network interface to bind vip to
+        :param cidr: string - Netmask for vip
+        :returns: None
+        """
         self.service_name = service_name
         self.vip = vip
         self.nic = nic
         self.cidr = cidr
 
     def configure_resource(self, crm):
+        """Configure new vip resource in crm
+
+        :param crm: CRM() instance - Config object for Pacemaker resources
+        :returns: None
+        """
         vip_key = 'res_{}_{}_vip'.format(self.service_name, self.nic)
         ipaddr = ipaddress.ip_address(self.vip)
         if isinstance(ipaddr, ipaddress.IPv4Address):
