@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import ipaddress
 from six import string_types
 
 
@@ -511,3 +512,67 @@ class ResourceDescriptor(object):
         configure the specific details under the covers.
         """
         pass
+
+
+class InitService(ResourceDescriptor):
+    def __init__(self, service_name, init_service_name):
+        """Class for managing init resource
+
+        :param service_name: string - Name of service
+        :param init_service_name: string - Name service uses in init system
+        :returns: None
+        """
+        self.service_name = service_name
+        self.init_service_name = init_service_name
+
+    def configure_resource(self, crm):
+        """"Configure new init system service resource in crm
+
+        :param crm: CRM() instance - Config object for Pacemaker resources
+        :returns: None
+        """
+        res_key = 'res_{}_{}'.format(
+            self.service_name.replace('-', '_'),
+            self.init_service_name.replace('-', '_'))
+        clone_key = 'cl_{}'.format(res_key)
+        res_type = 'lsb:{}'.format(self.init_service_name)
+        crm.primitive(res_key, res_type, params='op monitor interval="5s"')
+        crm.init_services(self.init_service_name)
+        crm.clone(clone_key, res_key)
+
+
+class VirtualIP(ResourceDescriptor):
+    def __init__(self, service_name, vip, nic=None, cidr=None):
+        """Class for managing VIP resource
+
+        :param service_name: string - Name of service
+        :param vip: string - Virtual IP to be managed
+        :param nic: string - Network interface to bind vip to
+        :param cidr: string - Netmask for vip
+        :returns: None
+        """
+        self.service_name = service_name
+        self.vip = vip
+        self.nic = nic
+        self.cidr = cidr
+
+    def configure_resource(self, crm):
+        """Configure new vip resource in crm
+
+        :param crm: CRM() instance - Config object for Pacemaker resources
+        :returns: None
+        """
+        vip_key = 'res_{}_{}_vip'.format(self.service_name, self.nic)
+        ipaddr = ipaddress.ip_address(self.vip)
+        if isinstance(ipaddr, ipaddress.IPv4Address):
+            res_type = 'ocf:heartbeat:IPaddr2'
+            res_params = 'ip="{}"'.format(self.vip)
+        else:
+            res_type = 'ocf:heartbeat:IPv6addr'
+            res_params = 'ipv6addr="{}"'.format(self.vip)
+
+        if self.nic:
+            res_params = '{} nic="{}"'.format(res_params, self.nic)
+        if self.cidr:
+            res_params = '{} cidr_netmask="{}"'.format(res_params, self.cidr)
+        crm.primitive(vip_key, res_type, params=res_params)
