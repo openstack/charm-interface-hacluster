@@ -515,15 +515,17 @@ class ResourceDescriptor(object):
 
 
 class InitService(ResourceDescriptor):
-    def __init__(self, service_name, init_service_name):
+    def __init__(self, service_name, init_service_name, clone=True):
         """Class for managing init resource
 
         :param service_name: string - Name of service
         :param init_service_name: string - Name service uses in init system
+        :param clone: bool - clone service across all units
         :returns: None
         """
         self.service_name = service_name
         self.init_service_name = init_service_name
+        self.clone = clone
 
     def configure_resource(self, crm):
         """"Configure new init system service resource in crm
@@ -534,11 +536,12 @@ class InitService(ResourceDescriptor):
         res_key = 'res_{}_{}'.format(
             self.service_name.replace('-', '_'),
             self.init_service_name.replace('-', '_'))
-        clone_key = 'cl_{}'.format(res_key)
         res_type = 'lsb:{}'.format(self.init_service_name)
         crm.primitive(res_key, res_type, params='op monitor interval="5s"')
         crm.init_services(self.init_service_name)
-        crm.clone(clone_key, res_key)
+        if self.clone:
+            clone_key = 'cl_{}'.format(res_key)
+            crm.clone(clone_key, res_key)
 
 
 class VirtualIP(ResourceDescriptor):
