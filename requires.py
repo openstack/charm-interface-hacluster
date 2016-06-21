@@ -103,7 +103,7 @@ class HAClusterRequires(RelationBase):
                 cidr=netmask,))
         self.set_local(resources=resources)
 
-    def add_init_service(self, name, service):
+    def add_init_service(self, name, service, clone=True):
         """Add a InitService object for haproxy to self.resources
 
         :param name: string - Name of service
@@ -116,5 +116,5 @@ class HAClusterRequires(RelationBase):
         else:
             resources = relations.hacluster.common.CRM()
         resources.add(
-            relations.hacluster.common.InitService(name, service,))
+            relations.hacluster.common.InitService(name, service, clone))
         self.set_local(resources=resources)
