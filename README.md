@@ -11,7 +11,7 @@ The interface layer will set the following reactive states, as appropriate:
 
   * `{relation_name}.connected` The relation is established and ready for
     the local charm to configure the hacluster subordinate charm. The
-    configuration of the resources to managed for the hacluster charm
+    configuration of the resources to manage for the hacluster charm
     can be managed via one of the following methods:
 
     * `manage_resources` method
