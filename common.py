@@ -537,7 +537,7 @@ class InitService(ResourceDescriptor):
             self.service_name.replace('-', '_'),
             self.init_service_name.replace('-', '_'))
         res_type = 'lsb:{}'.format(self.init_service_name)
-        crm.primitive(res_key, res_type, params='op monitor interval="5s"')
+        crm.primitive(res_key, res_type, op='monitor interval="5s"')
         crm.init_services(self.init_service_name)
         if self.clone:
             clone_key = 'cl_{}'.format(res_key)
