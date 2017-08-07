@@ -15,6 +15,7 @@ import relations.hacluster.common
 from charms.reactive import hook
 from charms.reactive import RelationBase
 from charms.reactive import scopes
+from charms.reactive.helpers import data_changed
 
 
 class HAClusterRequires(RelationBase):
@@ -43,7 +44,7 @@ class HAClusterRequires(RelationBase):
         if mcastport:
             relation_data['corosync_mcastport'] = mcastport
 
-        if relation_data:
+        if relation_data and data_changed('hacluster-bind_on', relation_data):
             self.set_local(**relation_data)
             self.set_remote(**relation_data)
 
@@ -64,8 +65,9 @@ class HAClusterRequires(RelationBase):
         :returns: None
         """
         relation_data = {k: v for k, v in crm.items() if v}
-        self.set_local(**relation_data)
-        self.set_remote(**relation_data)
+        if data_changed('hacluster-manage_resources', relation_data):
+            self.set_local(**relation_data)
+            self.set_remote(**relation_data)
 
     def bind_resources(self, iface, mcastport=None):
         """Inform the ha subordinate about each service it should manage. The
