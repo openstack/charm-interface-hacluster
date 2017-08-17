@@ -573,6 +573,9 @@ class VirtualIP(ResourceDescriptor):
         else:
             res_type = 'ocf:heartbeat:IPv6addr'
             res_params = 'ipv6addr="{}"'.format(self.vip)
+            vip_params = 'ipv6addr'
+            vip_key = 'res_{}_{}_{}_vip'.format(self.service_name, self.nic,
+                                                vip_params)
 
         if self.nic:
             res_params = '{} nic="{}"'.format(res_params, self.nic)

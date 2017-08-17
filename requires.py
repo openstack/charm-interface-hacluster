@@ -103,6 +103,14 @@ class HAClusterRequires(RelationBase):
                 vip,
                 nic=iface,
                 cidr=netmask,))
+
+        # Vip Group
+        group = 'grp_{}_vips'.format(name)
+        if resource_dict:
+            vip_resources = resource_dict.get('resources')
+            if vip_resources:
+                resources.group(group, *vip_resources.keys())
+
         self.set_local(resources=resources)
 
     def add_init_service(self, name, service, clone=True):
