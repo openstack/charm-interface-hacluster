@@ -106,10 +106,14 @@ class HAClusterRequires(RelationBase):
 
         # Vip Group
         group = 'grp_{}_vips'.format(name)
+        vip_res_group_members = []
         if resource_dict:
             vip_resources = resource_dict.get('resources')
             if vip_resources:
-                resources.group(group, *vip_resources.keys())
+                for vip_res in vip_resources:
+                    if 'vip' in vip_res:
+                        vip_res_group_members.append(vip_res)
+                resources.group(group, *vip_res_group_members)
 
         self.set_local(resources=resources)
 
