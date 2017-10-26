@@ -582,3 +582,39 @@ class VirtualIP(ResourceDescriptor):
         if self.cidr:
             res_params = '{} cidr_netmask="{}"'.format(res_params, self.cidr)
         crm.primitive(vip_key, res_type, params=res_params)
+
+
+class DNSEntry(ResourceDescriptor):
+
+    def __init__(self, service_name, ip, fqdn, endpoint_type):
+        """Class for managing DNS entries
+
+        :param service_name: string - Name of service
+        :param ip: string - IP to point DNS entry at
+        :param fqdn: string - DNS Entry
+        :param endpoint_type: string - The type of the endpoint represented by
+                                       the DNS record eg public, admin etc
+        :returns: None
+        """
+        self.service_name = service_name
+        self.ip = ip
+        self.fqdn = fqdn
+        self.endpoint_type = endpoint_type
+
+    def configure_resource(self, crm, res_type='ocf:maas:dns'):
+        """Configure new DNS resource in crm
+
+        :param crm: CRM() instance - Config object for Pacemaker resources
+        :param res_type: string - Corosync Open Cluster Framework resource
+                                  agent to use for DNS HA
+        :returns: None
+        """
+        res_key = 'res_{}_{}_hostname'.format(
+            self.service_name.replace('-', '_'),
+            self.endpoint_type)
+        res_params = ''
+        if self.fqdn:
+            res_params = '{} fqdn="{}"'.format(res_params, self.fqdn)
+        if self.ip:
+            res_params = '{} ip_address="{}"'.format(res_params, self.ip)
+        crm.primitive(res_key, res_type, params=res_params)

@@ -132,3 +132,33 @@ class HAClusterRequires(RelationBase):
         resources.add(
             relations.hacluster.common.InitService(name, service, clone))
         self.set_local(resources=resources)
+
+    def add_dnsha(self, name, ip, fqdn, endpoint_type):
+        """Add a DNS entry to self.resources
+
+        :param name: string - Name of service
+        :param ip: string - IP address dns entry should resolve to
+        :param fqdn: string - The DNS entry name
+        :param endpoint_type: string - Public, private, internal etc
+        :returns: None
+        """
+        resource_dict = self.get_local('resources')
+        if resource_dict:
+            resources = relations.hacluster.common.CRM(**resource_dict)
+        else:
+            resources = relations.hacluster.common.CRM()
+        resources.add(
+            relations.hacluster.common.DNSEntry(name, ip, fqdn, endpoint_type))
+
+        # DNS Group
+        group = 'grp_{}_hostnames'.format(name)
+        dns_res_group_members = []
+        if resource_dict:
+            dns_resources = resource_dict.get('resources')
+            if dns_resources:
+                for dns_res in dns_resources:
+                    if 'hostname' in dns_res:
+                        dns_res_group_members.append(dns_res)
+                resources.group(group, *dns_res_group_members)
+
+        self.set_local(resources=resources)
