@@ -11,6 +11,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
+
 import relations.hacluster.common
 from charms.reactive import hook
 from charms.reactive import RelationBase
@@ -64,7 +66,10 @@ class HAClusterRequires(RelationBase):
         :param crm: CRM() instance - Config object for Pacemaker resources
         :returns: None
         """
-        relation_data = {k: v for k, v in crm.items() if v}
+        relation_data = {
+            'json_{}'.format(k): json.dumps(v, sort_keys=True)
+            for k, v in crm.items() if v
+        }
         if data_changed('hacluster-manage_resources', relation_data):
             self.set_local(**relation_data)
             self.set_remote(**relation_data)
