@@ -300,7 +300,7 @@ class CRM(dict):
         --------
         http://crmsh.github.io/man/#cmdhelp_configure_delete
         """
-        self['delete_resources'].extend(resources)
+        self['delete_resources'] = resources
 
     def init_services(self, *resources):
         """Specifies that the service(s) is an init or upstart service.
@@ -317,7 +317,7 @@ class CRM(dict):
         -------
         None
         """
-        self['init_services'].extend(resources)
+        self['init_services'] = resources
 
     def ms(self, name, resource, description=None, **kwargs):
         """Create a master/slave resource type.
