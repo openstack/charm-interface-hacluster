@@ -144,7 +144,8 @@ class HAClusterRequires(RelationBase):
                 for vip_res in vip_resources:
                     if 'vip' in vip_res:
                         vip_res_group_members.append(vip_res)
-                resources.group(group, *vip_res_group_members)
+                resources.group(group,
+                                *sorted(vip_res_group_members))
 
         self.set_local(resources=resources)
 
@@ -190,7 +191,8 @@ class HAClusterRequires(RelationBase):
                 for dns_res in dns_resources:
                     if 'hostname' in dns_res:
                         dns_res_group_members.append(dns_res)
-                resources.group(group, *dns_res_group_members)
+                resources.group(group,
+                                *sorted(dns_res_group_members))
 
         self.set_local(resources=resources)
 
