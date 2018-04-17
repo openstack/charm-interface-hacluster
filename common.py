@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import hashlib
 import ipaddress
 from six import string_types
 
@@ -565,7 +566,12 @@ class VirtualIP(ResourceDescriptor):
         :param crm: CRM() instance - Config object for Pacemaker resources
         :returns: None
         """
-        vip_key = 'res_{}_{}_vip'.format(self.service_name, self.nic)
+        if self.nic:
+            vip_key = 'res_{}_{}_vip'.format(self.service_name, self.nic)
+        else:
+            vip_key = 'res_{}_{}_vip'.format(
+                self.service_name,
+                hashlib.sha1(self.vip.encode('UTF-8')).hexdigest()[:7])
         ipaddr = ipaddress.ip_address(self.vip)
         if isinstance(ipaddr, ipaddress.IPv4Address):
             res_type = 'ocf:heartbeat:IPaddr2'

@@ -100,7 +100,7 @@ class HAClusterRequires(RelationBase):
             self.set_local(**relation_data)
             self.set_remote(**relation_data)
 
-    def bind_resources(self, iface, mcastport=None):
+    def bind_resources(self, iface=None, mcastport=None):
         """Inform the ha subordinate about each service it should manage. The
         child class specifies the services via self.ha_resources
 
@@ -114,7 +114,7 @@ class HAClusterRequires(RelationBase):
         self.bind_on(iface=iface, mcastport=mcastport)
         self.manage_resources(resources)
 
-    def add_vip(self, name, vip, iface, netmask):
+    def add_vip(self, name, vip, iface=None, netmask=None):
         """Add a VirtualIP object for each user specified vip to self.resources
 
         :param name: string - Name of service
