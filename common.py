@@ -587,7 +587,9 @@ class VirtualIP(ResourceDescriptor):
             res_params = '{} nic="{}"'.format(res_params, self.nic)
         if self.cidr:
             res_params = '{} cidr_netmask="{}"'.format(res_params, self.cidr)
-        crm.primitive(vip_key, res_type, params=res_params)
+        # Monitor the VIP
+        _op_monitor = 'monitor depth="0" timeout="20s" interval="10s"'
+        crm.primitive(vip_key, res_type, params=res_params, op=_op_monitor)
 
 
 class DNSEntry(ResourceDescriptor):
