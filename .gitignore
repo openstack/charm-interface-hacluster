@@ -1,2 +1,6 @@
 .tox
 .testrepository
+.stestr
+.unit-state.db
+**/__pycache__/
+

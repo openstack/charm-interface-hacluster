@@ -139,8 +139,8 @@ class CRM(dict):
             if first:
                 results = results + ' '
                 first = False
-            results = results + ('%s %s' % (prefix, d))
-
+            results = results + ('%s %s ' % (prefix, d))
+        results = results.rstrip()
         return results
 
     def clone(self, name, resource, description=None, **kwargs):
@@ -275,7 +275,7 @@ class CRM(dict):
         """
         specs = ' '.join(resources)
         if 'description' in kwargs:
-            specs = specs + (' description="' % kwargs['description'])
+            specs = specs + (' description=%s"' % kwargs['description'])
 
         for key in 'meta', 'params':
             if key not in kwargs:
