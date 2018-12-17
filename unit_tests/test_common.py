@@ -192,6 +192,27 @@ class TestHAClusterCommonCRM(unittest.TestCase):
             crm['delete_resources'],
             ('res_mysql_vip', 'grp_mysql'))
 
+    def test_add_delete_resource(self):
+        crm = common.CRM()
+        crm.add_delete_resource('res_mysql_vip')
+        self.assertEqual(crm['delete_resources'], ('res_mysql_vip',))
+
+    def test_add_delete_resource_multi(self):
+        crm = common.CRM()
+        crm.add_delete_resource('res_mysql_vip')
+        crm.add_delete_resource('grp_mysql')
+        self.assertEqual(
+            crm['delete_resources'],
+            ('res_mysql_vip', 'grp_mysql'))
+
+    def test_add_delete_resource_mix(self):
+        crm = common.CRM()
+        crm.delete_resource('grp_mysql')
+        crm.add_delete_resource('res_mysql_vip')
+        self.assertEqual(
+            crm['delete_resources'],
+            ('grp_mysql', 'res_mysql_vip'))
+
     def test_init_services(self):
         crm = common.CRM()
         crm.init_services('haproxy')

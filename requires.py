@@ -114,6 +114,15 @@ class HAClusterRequires(RelationBase):
         self.bind_on(iface=iface, mcastport=mcastport)
         self.manage_resources(resources)
 
+    def delete_resource(self, resource_name):
+        resource_dict = self.get_local('resources')
+        if resource_dict:
+            resources = relations.hacluster.common.CRM(**resource_dict)
+        else:
+            resources = relations.hacluster.common.CRM()
+        resources.add_delete_resource(resource_name)
+        self.set_local(resources=resources)
+
     def add_vip(self, name, vip, iface=None, netmask=None):
         """Add a VirtualIP object for each user specified vip to self.resources
 
