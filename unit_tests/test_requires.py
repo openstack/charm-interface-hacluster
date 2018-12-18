@@ -11,6 +11,7 @@
 # limitations under the License.
 
 
+import copy
 import json
 import mock
 import unittest
@@ -211,6 +212,48 @@ class TestHAClusterRequires(unittest.TestCase):
         self.cr.bind_resources(iface='tr34', mcastport=111)
         self.bind_on.assert_called_once_with(iface='tr34', mcastport=111)
         self.manage_resources.assert_called_once_with('resources')
+
+    def test_delete_resource(self):
+        expected = {
+            'resources': {},
+            'resource_params': {},
+            'delete_resources': ('doomed_res',),
+            'groups': {},
+            'ms': {},
+            'orders': {},
+            'colocations': {},
+            'clones': {},
+            'locations': {},
+            'init_services': []}
+        self.patch_kr('get_local', None)
+        self.patch_kr('set_local')
+        self.cr.delete_resource('doomed_res')
+        self.set_local.assert_called_once_with(resources=expected)
+
+    def test_delete_resource_multi(self):
+        base = {
+            'resources': {},
+            'resource_params': {},
+            'groups': {},
+            'ms': {},
+            'orders': {},
+            'colocations': {},
+            'clones': {},
+            'locations': {},
+            'init_services': []}
+        res_with_res1 = copy.deepcopy(base)
+        res_with_res1_res2 = copy.deepcopy(base)
+        res_with_res1['delete_resources'] = ('doomed_res1',)
+        res_with_res1_res2['delete_resources'] = ('doomed_res1', 'doomed_res2')
+        get_local_results = [res_with_res1, base]
+        self.patch_kr('get_local')
+        self.get_local.side_effect = lambda x: get_local_results.pop()
+        self.patch_kr('set_local')
+        self.cr.delete_resource('doomed_res1')
+        self.cr.delete_resource('doomed_res2')
+        self.set_local.assert_has_calls([
+            mock.call(resources=res_with_res1),
+            mock.call(resources=res_with_res1_res2)])
 
     def test_add_vip(self):
         expected = {
