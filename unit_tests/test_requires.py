@@ -11,7 +11,6 @@
 # limitations under the License.
 
 
-import copy
 import json
 import mock
 import unittest
@@ -86,6 +85,7 @@ class TestHAClusterRequires(unittest.TestCase):
 
     def setUp(self):
         self.cr = requires.HAClusterRequires('some-relation', [])
+        self.reactive_db = {}
         self._patches = {}
         self._patches_start = {}
         self.obj = requires
@@ -99,6 +99,25 @@ class TestHAClusterRequires(unittest.TestCase):
             setattr(self, k, None)
         self._patches = None
         self._patches_start = None
+
+    def _set_local(self, key=None, value=None, **kwdata):
+        if key is not None:
+            self.reactive_db[key] = value
+        self.reactive_db.update(kwdata)
+
+    def _get_db_res(self, key):
+        return self.reactive_db['resources'][key]
+
+    def _get_local(self, key):
+        return self.reactive_db.get(key)
+
+    def mock_reactive_db(self, preseed=None):
+        self.patch_kr('get_local')
+        self.get_local.side_effect = self._get_local
+        self.patch_kr('set_local')
+        self.set_local.side_effect = self._set_local
+        if preseed:
+            self._set_local(resources=preseed)
 
     def patch_kr(self, attr, return_value=None):
         mocked = mock.patch.object(self.cr, attr)
@@ -214,10 +233,13 @@ class TestHAClusterRequires(unittest.TestCase):
         self.manage_resources.assert_called_once_with('resources')
 
     def test_delete_resource(self):
-        expected = {
-            'resources': {},
-            'resource_params': {},
-            'delete_resources': ('doomed_res',),
+        existing_data = {
+            'resources': {
+                'res_mysql_ens3_vip': 'ocf:heartbeat:IPaddr2'},
+            'resource_params': {
+                'res_mysql_ens3_vip': (
+                    '  params ip="10.110.5.43"  op monitor depth="0" '
+                    'timeout="20s" interval="10s"')},
             'groups': {},
             'ms': {},
             'orders': {},
@@ -225,35 +247,52 @@ class TestHAClusterRequires(unittest.TestCase):
             'clones': {},
             'locations': {},
             'init_services': []}
-        self.patch_kr('get_local', None)
-        self.patch_kr('set_local')
-        self.cr.delete_resource('doomed_res')
-        self.set_local.assert_called_once_with(resources=expected)
+        self.mock_reactive_db(existing_data)
+        self.cr.delete_resource('res_mysql_ens3_vip')
+        self.assertEqual(
+            self._get_local('resources')['delete_resources'],
+            ('res_mysql_ens3_vip',))
+        self.assertIsNone(
+            self._get_db_res('resources').get('res_mysql_ens3_vip'))
+        self.assertIsNone(
+            self._get_db_res('resource_params').get('res_mysql_ens3_vip'))
 
     def test_delete_resource_multi(self):
-        base = {
-            'resources': {},
-            'resource_params': {},
+        existing_data = {
+            'resources': {
+                'res_mysql_ens3_vip': 'ocf:heartbeat:IPaddr2',
+                'res_mysql_ens4_vip': 'ocf:heartbeat:IPaddr2'},
+            'resource_params': {
+                'res_mysql_ens3_vip': (
+                    '  params ip="10.110.5.43"  op monitor depth="0" '
+                    'timeout="20s" interval="10s"'),
+                'res_mysql_ens4_vip': (
+                    '  params ip="10.110.5.43"  op monitor depth="0" '
+                    'timeout="20s" interval="10s"')},
             'groups': {},
             'ms': {},
             'orders': {},
             'colocations': {},
             'clones': {},
             'locations': {},
-            'init_services': []}
-        res_with_res1 = copy.deepcopy(base)
-        res_with_res1_res2 = copy.deepcopy(base)
-        res_with_res1['delete_resources'] = ('doomed_res1',)
-        res_with_res1_res2['delete_resources'] = ('doomed_res1', 'doomed_res2')
-        get_local_results = [res_with_res1, base]
-        self.patch_kr('get_local')
-        self.get_local.side_effect = lambda x: get_local_results.pop()
-        self.patch_kr('set_local')
-        self.cr.delete_resource('doomed_res1')
-        self.cr.delete_resource('doomed_res2')
-        self.set_local.assert_has_calls([
-            mock.call(resources=res_with_res1),
-            mock.call(resources=res_with_res1_res2)])
+            'init_services': ('telnetd',)}
+        self.mock_reactive_db(existing_data)
+        self.cr.delete_resource('res_mysql_ens3_vip')
+        self.cr.delete_resource('res_mysql_ens4_vip')
+        self.cr.delete_resource('telnetd')
+        self.assertEqual(
+            self._get_local('resources')['delete_resources'],
+            ('res_mysql_ens3_vip', 'res_mysql_ens4_vip', 'telnetd'))
+        self.assertIsNone(
+            self._get_db_res('resources').get('res_mysql_ens3_vip'))
+        self.assertIsNone(
+            self._get_db_res('resource_params').get('res_mysql_ens3_vip'))
+        self.assertIsNone(
+            self._get_db_res('resources').get('res_mysql_ens4_vip'))
+        self.assertIsNone(
+            self._get_db_res('resource_params').get('res_mysql_ens4_vip'))
+        self.assertFalse(
+            'telnetd' in self._get_db_res('init_services'))
 
     def test_add_vip(self):
         expected = {
@@ -272,8 +311,7 @@ class TestHAClusterRequires(unittest.TestCase):
             'locations': {},
             'init_services': []}
 
-        self.patch_kr('get_local', None)
-        self.patch_kr('set_local')
+        self.mock_reactive_db()
         self.cr.add_vip('mysql', '10.110.5.43')
         self.set_local.assert_called_once_with(resources=expected)
 
@@ -316,8 +354,7 @@ class TestHAClusterRequires(unittest.TestCase):
             'locations': {},
             'init_services': []}
 
-        self.patch_kr('get_local', existing_resource)
-        self.patch_kr('set_local')
+        self.mock_reactive_db(existing_resource)
         self.cr.add_vip('mysql', '10.120.5.43')
         self.set_local.assert_called_once_with(resources=expected)
 
@@ -335,8 +372,7 @@ class TestHAClusterRequires(unittest.TestCase):
             'clones': {'cl_res_mysql_telnetd': 'res_mysql_telnetd'},
             'locations': {},
             'init_services': ('telnetd',)}
-        self.patch_kr('get_local', None)
-        self.patch_kr('set_local')
+        self.mock_reactive_db()
         self.cr.add_init_service('mysql', 'telnetd')
         self.set_local.assert_called_once_with(resources=expected)
 
@@ -357,8 +393,7 @@ class TestHAClusterRequires(unittest.TestCase):
             'locations': {},
             'init_services': []}
 
-        self.patch_kr('get_local', None)
-        self.patch_kr('set_local')
+        self.mock_reactive_db()
         self.cr.add_dnsha(
             'keystone',
             '10.110.5.43',
@@ -404,8 +439,7 @@ class TestHAClusterRequires(unittest.TestCase):
             'locations': {},
             'init_services': []}
 
-        self.patch_kr('get_local', existing_resource)
-        self.patch_kr('set_local')
+        self.mock_reactive_db(existing_resource)
         self.cr.add_dnsha(
             'keystone',
             '10.120.5.43',

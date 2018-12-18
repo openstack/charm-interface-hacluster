@@ -285,6 +285,20 @@ class CRM(dict):
 
         self['groups'][name] = specs
 
+    def remove_deleted_resources(self):
+        """Work through the existing resources and remove any mention of ones
+           which have been marked for deletion."""
+        for res in self['delete_resources']:
+            for key in self.keys():
+                if key == 'delete_resources':
+                    continue
+                if isinstance(self[key], dict) and res in self[key].keys():
+                    del self[key][res]
+                elif isinstance(self[key], list) and res in self[key]:
+                    self[key].remove(res)
+                elif isinstance(self[key], tuple) and res in self[key]:
+                    self[key] = tuple(x for x in self[key] if x != res)
+
     def delete_resource(self, *resources):
         """Specify objects/resources to be deleted from within Pacemaker. This
            is not additive, the list of resources is set to exaclty what was
@@ -304,6 +318,7 @@ class CRM(dict):
         http://crmsh.github.io/man/#cmdhelp_configure_delete
         """
         self['delete_resources'] = resources
+        self.remove_deleted_resources()
 
     def add_delete_resource(self, resource):
         """Specify an object/resource to delete from within Pacemaker. It can
@@ -324,6 +339,7 @@ class CRM(dict):
         http://crmsh.github.io/man/#cmdhelp_configure_delete
         """
         self['delete_resources'] = (*self['delete_resources'], resource)
+        self.remove_deleted_resources()
 
     def init_services(self, *resources):
         """Specifies that the service(s) is an init or upstart service.
