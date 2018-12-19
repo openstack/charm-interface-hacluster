@@ -338,8 +338,9 @@ class CRM(dict):
         --------
         http://crmsh.github.io/man/#cmdhelp_configure_delete
         """
-        self['delete_resources'] = (*self['delete_resources'], resource)
-        self.remove_deleted_resources()
+        if resource not in self['delete_resources']:
+            self['delete_resources'] = (*self['delete_resources'], resource)
+            self.remove_deleted_resources()
 
     def init_services(self, *resources):
         """Specifies that the service(s) is an init or upstart service.
