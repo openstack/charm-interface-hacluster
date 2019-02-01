@@ -339,7 +339,11 @@ class CRM(dict):
         http://crmsh.github.io/man/#cmdhelp_configure_delete
         """
         if resource not in self['delete_resources']:
-            self['delete_resources'] = (*self['delete_resources'], resource)
+            # NOTE(fnordahl): this unpleasant piece of code is regrettably
+            # necessary for Python3.4 (and trusty) compability see LP: #1814218
+            # and LP: #1813982
+            self['delete_resources'] = tuple(
+                self['delete_resources'] or ()) + (resource,)
             self.remove_deleted_resources()
 
     def init_services(self, *resources):
