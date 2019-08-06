@@ -301,7 +301,10 @@ class TestHAClusterRequires(unittest.TestCase):
             'delete_resources': [],
             'resource_params': {
                 'res_mysql_4b8ce37_vip': (
-                    '  params ip="10.110.5.43"  op monitor depth="0" '
+                    '  params ip="10.110.5.43"'
+                    '  meta migration-threshold="INFINITY" '
+                    'failure-timeout="5s"'
+                    '  op monitor depth="0" '
                     'timeout="20s" interval="10s"')},
             'groups': {},
             'ms': {},
@@ -339,10 +342,14 @@ class TestHAClusterRequires(unittest.TestCase):
             'delete_resources': [],
             'resource_params': {
                 'res_mysql_4b8ce37_vip': (
-                    '  params ip="10.110.5.43"  op monitor depth="0" '
+                    '  params ip="10.110.5.43"'
+                    '  op monitor depth="0" '
                     'timeout="20s" interval="10s"'),
                 'res_mysql_1993276_vip': (
-                    '  params ip="10.120.5.43"  op monitor depth="0" '
+                    '  params ip="10.120.5.43"'
+                    '  meta migration-threshold="INFINITY" '
+                    'failure-timeout="5s"'
+                    '  op monitor depth="0" '
                     'timeout="20s" interval="10s"')},
             'groups': {
                 'grp_mysql_vips': ('res_mysql_1993276_vip '
@@ -364,7 +371,10 @@ class TestHAClusterRequires(unittest.TestCase):
                 'res_mysql_telnetd': 'lsb:telnetd'},
             'delete_resources': [],
             'resource_params': {
-                'res_mysql_telnetd': '  op monitor interval="5s"'},
+                'res_mysql_telnetd':
+                    ('  meta migration-threshold="INFINITY" '
+                     'failure-timeout="5s"'
+                     '  op monitor interval="5s"')},
             'groups': {},
             'ms': {},
             'orders': {},
