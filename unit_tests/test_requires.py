@@ -246,7 +246,8 @@ class TestHAClusterRequires(unittest.TestCase):
             'colocations': {},
             'clones': {},
             'locations': {},
-            'init_services': []}
+            'init_services': [],
+            'systemd_services': []}
         self.mock_reactive_db(existing_data)
         self.cr.delete_resource('res_mysql_ens3_vip')
         self.assertEqual(
@@ -275,7 +276,8 @@ class TestHAClusterRequires(unittest.TestCase):
             'colocations': {},
             'clones': {},
             'locations': {},
-            'init_services': ('telnetd',)}
+            'init_services': ('telnetd',),
+            'systemd_services': []}
         self.mock_reactive_db(existing_data)
         self.cr.delete_resource('res_mysql_ens3_vip')
         self.cr.delete_resource('res_mysql_ens4_vip')
@@ -309,7 +311,8 @@ class TestHAClusterRequires(unittest.TestCase):
             'colocations': {},
             'clones': {},
             'locations': {},
-            'init_services': []}
+            'init_services': [],
+            'systemd_services': []}
 
         self.mock_reactive_db()
         self.cr.add_vip('mysql', '10.110.5.43')
@@ -330,7 +333,8 @@ class TestHAClusterRequires(unittest.TestCase):
             'colocations': {},
             'clones': {},
             'locations': {},
-            'init_services': []}
+            'init_services': [],
+            'systemd_services': []}
 
         expected = {
             'resources': {
@@ -352,7 +356,8 @@ class TestHAClusterRequires(unittest.TestCase):
             'colocations': {},
             'clones': {},
             'locations': {},
-            'init_services': []}
+            'init_services': [],
+            'systemd_services': []}
 
         self.mock_reactive_db(existing_resource)
         self.cr.add_vip('mysql', '10.120.5.43')
@@ -371,7 +376,8 @@ class TestHAClusterRequires(unittest.TestCase):
             'colocations': {},
             'clones': {'cl_res_mysql_telnetd': 'res_mysql_telnetd'},
             'locations': {},
-            'init_services': ('telnetd',)}
+            'init_services': ('telnetd',),
+            'systemd_services': []}
         self.mock_reactive_db()
         self.cr.add_init_service('mysql', 'telnetd')
         self.set_local.assert_called_once_with(resources=expected)
@@ -391,7 +397,8 @@ class TestHAClusterRequires(unittest.TestCase):
             'colocations': {},
             'clones': {},
             'locations': {},
-            'init_services': []}
+            'init_services': [],
+            'systemd_services': []}
 
         self.mock_reactive_db()
         self.cr.add_dnsha(
@@ -416,7 +423,8 @@ class TestHAClusterRequires(unittest.TestCase):
             'colocations': {},
             'clones': {},
             'locations': {},
-            'init_services': []}
+            'init_services': [],
+            'systemd_services': []}
         expected = {
             'resources': {
                 'res_keystone_public_hostname': 'ocf:maas:dns',
@@ -437,7 +445,8 @@ class TestHAClusterRequires(unittest.TestCase):
             'colocations': {},
             'clones': {},
             'locations': {},
-            'init_services': []}
+            'init_services': [],
+            'systemd_services': []}
 
         self.mock_reactive_db(existing_resource)
         self.cr.add_dnsha(
@@ -462,7 +471,8 @@ class TestHAClusterRequires(unittest.TestCase):
                 'app2/0': {
                     'key1': 'value1',
                     'key2': 'value3'}},
-            'rid:3': {}}
+            'rid:3': {},
+            'systemd_services': []}
 
         def get_unit_data(key, unit, relation_id):
             return unit_data[relation_id].get(unit, {}).get(key, {})
@@ -489,3 +499,22 @@ class TestHAClusterRequires(unittest.TestCase):
         self.assertEqual(
             self.cr.get_remote_all('key100', default='defaultvalue'),
             ['defaultvalue'])
+
+    def test_add_systemd_service(self):
+        expected = {
+            'resources': {
+                'res_mysql_telnetd': 'systemd:telnetd'},
+            'delete_resources': [],
+            'resource_params': {
+                'res_mysql_telnetd': '  op monitor interval="5s"'},
+            'groups': {},
+            'ms': {},
+            'orders': {},
+            'colocations': {},
+            'clones': {'cl_res_mysql_telnetd': 'res_mysql_telnetd'},
+            'locations': {},
+            'init_services': [],
+            'systemd_services': ('telnetd',)}
+        self.mock_reactive_db()
+        self.cr.add_systemd_service('mysql', 'telnetd')
+        self.set_local.assert_called_once_with(resources=expected)

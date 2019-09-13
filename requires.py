@@ -199,6 +199,33 @@ class HAClusterRequires(RelationBase):
             service.replace('-', '_'))
         self.delete_resource(res_key)
 
+    def add_systemd_service(self, name, service, clone=True):
+        """Add a SystemdService object to self.resources
+
+        :param name: string - Name of service
+        :param service: string - Name service uses in systemd
+        :returns: None
+        """
+        resource_dict = self.get_local('resources')
+        if resource_dict:
+            resources = relations.hacluster.common.CRM(**resource_dict)
+        else:
+            resources = relations.hacluster.common.CRM()
+        resources.add(
+            relations.hacluster.common.SystemdService(name, service, clone))
+        self.set_local(resources=resources)
+
+    def remove_systemd_service(self, name, service):
+        """Remove a systemd service
+
+        :param name: string - Name of service
+        :param service: string - Name of service used in systemd
+        """
+        res_key = 'res_{}_{}'.format(
+            name.replace('-', '_'),
+            service.replace('-', '_'))
+        self.delete_resource(res_key)
+
     def add_dnsha(self, name, ip, fqdn, endpoint_type):
         """Add a DNS entry to self.resources
 

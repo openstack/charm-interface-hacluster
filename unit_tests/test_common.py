@@ -30,7 +30,8 @@ class TestHAClusterCommonCRM(unittest.TestCase):
             'colocations': {},
             'clones': {},
             'locations': {},
-            'init_services': []}
+            'init_services': [],
+            'systemd_services': []}
 
         self.assertEqual(
             crm,
@@ -259,6 +260,20 @@ class TestHAClusterCommonCRM(unittest.TestCase):
             crm['ms']['disk1'],
             'drbd1 description="useful desc"')
 
+    def test_systemd_services(self):
+        crm = common.CRM()
+        crm.systemd_services('haproxy')
+        self.assertEqual(
+            crm['systemd_services'],
+            ('haproxy',))
+
+    def test_systemd_services_multi(self):
+        crm = common.CRM()
+        crm.systemd_services('haproxy', 'apache2')
+        self.assertEqual(
+            crm['systemd_services'],
+            ('haproxy', 'apache2'))
+
     # The method signature of 'order' seems broken. Leaving out unit tests for
     # it as they would just confirm broken behaviour.
 
@@ -384,3 +399,48 @@ class TestHAClusterCommonDNSEntry(unittest.TestCase):
         self.assertEqual(
             crm['resource_params']['res_keystone_admin_hostname'],
             '  params  fqdn="keystone.admin" ip_address="10.110.1.1"')
+
+
+class TestHAClusterCommonSystemdService(unittest.TestCase):
+
+    def test_systemd(self):
+        systemd_svc = common.SystemdService('apache', 'apache2')
+        self.assertEqual(
+            systemd_svc.service_name,
+            'apache')
+        self.assertEqual(
+            systemd_svc.systemd_service_name,
+            'apache2')
+        self.assertTrue(systemd_svc.clone)
+
+    def test_systemd_no_clone(self):
+        systemd_svc = common.SystemdService('apache', 'apache2', clone=False)
+        self.assertFalse(systemd_svc.clone)
+
+    def test_configure_resource(self):
+        crm = common.CRM()
+        systemd_svc = common.SystemdService('apache', 'apache2')
+        systemd_svc.configure_resource(crm)
+        self.assertEqual(
+            crm['resources']['res_apache_apache2'],
+            'systemd:apache2')
+        self.assertEqual(
+            crm['resource_params']['res_apache_apache2'],
+            ('  op monitor interval="5s"'))
+        self.assertEqual(crm['systemd_services'], ('apache2',))
+        self.assertEqual(
+            crm['clones']['cl_res_apache_apache2'],
+            'res_apache_apache2')
+
+    def test_configure_resource_no_clone(self):
+        crm = common.CRM()
+        systemd_svc = common.SystemdService('apache', 'apache2', clone=False)
+        systemd_svc.configure_resource(crm)
+        self.assertEqual(
+            crm['resources']['res_apache_apache2'],
+            'systemd:apache2')
+        self.assertEqual(
+            crm['resource_params']['res_apache_apache2'],
+            ('  op monitor interval="5s"'))
+        self.assertEqual(crm['systemd_services'], ('apache2',))
+        self.assertFalse(crm['clones'].get('cl_res_apache_apache2'))
