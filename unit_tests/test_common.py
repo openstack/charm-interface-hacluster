@@ -311,7 +311,8 @@ class TestHAClusterCommonInitService(unittest.TestCase):
             'lsb:apache2')
         self.assertEqual(
             crm['resource_params']['res_apache_apache2'],
-            ('  op monitor interval="5s"'))
+            ('  meta migration-threshold="INFINITY" failure-timeout="5s"'
+             '  op monitor interval="5s"'))
         self.assertEqual(crm['init_services'], ('apache2',))
         self.assertEqual(
             crm['clones']['cl_res_apache_apache2'],
@@ -326,7 +327,8 @@ class TestHAClusterCommonInitService(unittest.TestCase):
             'lsb:apache2')
         self.assertEqual(
             crm['resource_params']['res_apache_apache2'],
-            ('  op monitor interval="5s"'))
+            ('  meta migration-threshold="INFINITY" failure-timeout="5s"'
+             '  op monitor interval="5s"'))
         self.assertEqual(crm['init_services'], ('apache2',))
         self.assertFalse(crm['clones'].get('cl_res_apache_apache2'))
 
@@ -357,6 +359,7 @@ class TestHAClusterCommonVirtualIP(unittest.TestCase):
         self.assertEqual(
             crm['resource_params']['res_apache_eth1_vip'],
             ('  params ip="10.110.1.1" nic="eth1" cidr_netmask="24"  '
+             'meta migration-threshold="INFINITY" failure-timeout="5s"  '
              'op monitor depth="0" timeout="20s" interval="10s"'))
 
     def test_configure_resource_no_nic(self):
@@ -369,6 +372,7 @@ class TestHAClusterCommonVirtualIP(unittest.TestCase):
         self.assertEqual(
             crm['resource_params']['res_apache_a7815c8_vip'],
             ('  params ip="10.110.1.1"  '
+             'meta migration-threshold="INFINITY" failure-timeout="5s"  '
              'op monitor depth="0" timeout="20s" interval="10s"'))
 
 

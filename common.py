@@ -599,7 +599,9 @@ class InitService(ResourceDescriptor):
             self.service_name.replace('-', '_'),
             self.init_service_name.replace('-', '_'))
         res_type = 'lsb:{}'.format(self.init_service_name)
-        crm.primitive(res_key, res_type, op='monitor interval="5s"')
+        _meta = 'migration-threshold="INFINITY" failure-timeout="5s"'
+        crm.primitive(
+            res_key, res_type, op='monitor interval="5s"', meta=_meta)
         crm.init_services(self.init_service_name)
         if self.clone:
             clone_key = 'cl_{}'.format(res_key)
@@ -650,7 +652,9 @@ class VirtualIP(ResourceDescriptor):
             res_params = '{} cidr_netmask="{}"'.format(res_params, self.cidr)
         # Monitor the VIP
         _op_monitor = 'monitor depth="0" timeout="20s" interval="10s"'
-        crm.primitive(vip_key, res_type, params=res_params, op=_op_monitor)
+        _meta = 'migration-threshold="INFINITY" failure-timeout="5s"'
+        crm.primitive(
+            vip_key, res_type, params=res_params, op=_op_monitor, meta=_meta)
 
 
 class DNSEntry(ResourceDescriptor):
