@@ -217,20 +217,36 @@ class TestHAClusterRequires(unittest.TestCase):
         self.assertFalse(self.set_remote.called)
 
     def test_bind_resources(self):
-        self.patch_kr('get_local', 'resources')
+        expected = {
+            'colocations': {}, 'groups': {},
+            'clones': {}, 'orders': {},
+            'resource_params': {}, 'delete_resources': [],
+            'init_services': [], 'locations': {},
+            'some': 'resources', 'systemd_services': [],
+            'resources': {}, 'ms': {}
+        }
+        self.patch_kr('get_local', expected)
         self.patch_kr('bind_on')
         self.patch_kr('manage_resources')
         self.cr.bind_resources()
         self.bind_on.assert_called_once_with(iface=None, mcastport=4440)
-        self.manage_resources.assert_called_once_with('resources')
+        self.manage_resources.assert_called_once_with(expected)
 
     def test_bind_resources_no_defaults(self):
-        self.patch_kr('get_local', 'resources')
+        expected = {
+            'colocations': {}, 'groups': {},
+            'clones': {}, 'orders': {},
+            'resource_params': {}, 'delete_resources': [],
+            'init_services': [], 'locations': {},
+            'some': 'resources', 'systemd_services': [],
+            'resources': {}, 'ms': {}
+        }
+        self.patch_kr('get_local', expected)
         self.patch_kr('bind_on')
         self.patch_kr('manage_resources')
         self.cr.bind_resources(iface='tr34', mcastport=111)
         self.bind_on.assert_called_once_with(iface='tr34', mcastport=111)
-        self.manage_resources.assert_called_once_with('resources')
+        self.manage_resources.assert_called_once_with(expected)
 
     def test_delete_resource(self):
         existing_data = {

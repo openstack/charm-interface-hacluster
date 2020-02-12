@@ -111,9 +111,11 @@ class HAClusterRequires(RelationBase):
         """
         if mcastport is None:
             mcastport = 4440
-        resources = self.get_local('resources')
+        resources_dict = self.get_local('resources')
         self.bind_on(iface=iface, mcastport=mcastport)
-        self.manage_resources(resources)
+        if resources_dict:
+            resources = relations.hacluster.common.CRM(**resources_dict)
+            self.manage_resources(resources)
 
     def delete_resource(self, resource_name):
         resource_dict = self.get_local('resources')
