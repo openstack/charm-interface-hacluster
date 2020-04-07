@@ -532,7 +532,10 @@ class TestHAClusterRequires(unittest.TestCase):
                 'res_mysql_telnetd': 'systemd:telnetd'},
             'delete_resources': [],
             'resource_params': {
-                'res_mysql_telnetd': '  op monitor interval="5s"'},
+                'res_mysql_telnetd':
+                    ('  meta migration-threshold="INFINITY" '
+                     'failure-timeout="5s"'
+                     '  op monitor interval="5s"')},
             'groups': {},
             'ms': {},
             'orders': {},

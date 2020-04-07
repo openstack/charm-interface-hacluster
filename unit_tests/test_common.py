@@ -430,7 +430,8 @@ class TestHAClusterCommonSystemdService(unittest.TestCase):
             'systemd:apache2')
         self.assertEqual(
             crm['resource_params']['res_apache_apache2'],
-            ('  op monitor interval="5s"'))
+            ('  meta migration-threshold="INFINITY" failure-timeout="5s"'
+             '  op monitor interval="5s"'))
         self.assertEqual(crm['systemd_services'], ('apache2',))
         self.assertEqual(
             crm['clones']['cl_res_apache_apache2'],
@@ -445,6 +446,7 @@ class TestHAClusterCommonSystemdService(unittest.TestCase):
             'systemd:apache2')
         self.assertEqual(
             crm['resource_params']['res_apache_apache2'],
-            ('  op monitor interval="5s"'))
+            ('  meta migration-threshold="INFINITY" failure-timeout="5s"'
+             '  op monitor interval="5s"'))
         self.assertEqual(crm['systemd_services'], ('apache2',))
         self.assertFalse(crm['clones'].get('cl_res_apache_apache2'))

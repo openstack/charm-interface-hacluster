@@ -717,7 +717,9 @@ class SystemdService(ResourceDescriptor):
             self.service_name.replace('-', '_'),
             self.systemd_service_name.replace('-', '_'))
         res_type = 'systemd:{}'.format(self.systemd_service_name)
-        crm.primitive(res_key, res_type, op='monitor interval="5s"')
+        _meta = 'migration-threshold="INFINITY" failure-timeout="5s"'
+        crm.primitive(
+            res_key, res_type, op='monitor interval="5s"', meta=_meta)
         crm.systemd_services(self.systemd_service_name)
         if self.clone:
             clone_key = 'cl_{}'.format(res_key)
