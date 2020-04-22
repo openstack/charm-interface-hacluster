@@ -651,7 +651,7 @@ class VirtualIP(ResourceDescriptor):
         if self.cidr:
             res_params = '{} cidr_netmask="{}"'.format(res_params, self.cidr)
         # Monitor the VIP
-        _op_monitor = 'monitor depth="0" timeout="20s" interval="10s"'
+        _op_monitor = 'monitor timeout="20s" interval="10s" depth="0"'
         _meta = 'migration-threshold="INFINITY" failure-timeout="5s"'
         crm.primitive(
             vip_key, res_type, params=res_params, op=_op_monitor, meta=_meta)

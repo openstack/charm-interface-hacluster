@@ -360,7 +360,7 @@ class TestHAClusterCommonVirtualIP(unittest.TestCase):
             crm['resource_params']['res_apache_eth1_vip'],
             ('  params ip="10.110.1.1" nic="eth1" cidr_netmask="24"  '
              'meta migration-threshold="INFINITY" failure-timeout="5s"  '
-             'op monitor depth="0" timeout="20s" interval="10s"'))
+             'op monitor timeout="20s" interval="10s" depth="0"'))
 
     def test_configure_resource_no_nic(self):
         crm = common.CRM()
@@ -373,7 +373,7 @@ class TestHAClusterCommonVirtualIP(unittest.TestCase):
             crm['resource_params']['res_apache_a7815c8_vip'],
             ('  params ip="10.110.1.1"  '
              'meta migration-threshold="INFINITY" failure-timeout="5s"  '
-             'op monitor depth="0" timeout="20s" interval="10s"'))
+             'op monitor timeout="20s" interval="10s" depth="0"'))
 
 
 class TestHAClusterCommonDNSEntry(unittest.TestCase):

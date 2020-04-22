@@ -322,8 +322,8 @@ class TestHAClusterRequires(unittest.TestCase):
                     '  params ip="10.110.5.43"'
                     '  meta migration-threshold="INFINITY" '
                     'failure-timeout="5s"'
-                    '  op monitor depth="0" '
-                    'timeout="20s" interval="10s"')},
+                    '  op monitor timeout="20s" '
+                    'interval="10s" depth="0"')},
             'groups': {},
             'ms': {},
             'orders': {},
@@ -369,8 +369,8 @@ class TestHAClusterRequires(unittest.TestCase):
                     '  params ip="10.120.5.43"'
                     '  meta migration-threshold="INFINITY" '
                     'failure-timeout="5s"'
-                    '  op monitor depth="0" '
-                    'timeout="20s" interval="10s"')},
+                    '  op monitor timeout="20s" '
+                    'interval="10s" depth="0"')},
             'groups': {
                 'grp_mysql_vips': ('res_mysql_1993276_vip '
                                    'res_mysql_4b8ce37_vip')},
