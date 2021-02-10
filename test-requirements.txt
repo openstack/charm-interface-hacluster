@@ -1,6 +1,6 @@
 # Lint and unit test requirements
 flake8
-os-testr>=0.4.1
+stestr>=2.2.0
 charms.reactive
 coverage>=3.6
 netifaces

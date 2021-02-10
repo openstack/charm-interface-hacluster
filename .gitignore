@@ -3,4 +3,5 @@
 .stestr
 .unit-state.db
 **/__pycache__/
-
+.coverage
+cover/
