@@ -15,16 +15,17 @@ import json
 from unittest import mock
 import unittest
 
-import common
+import interface_hacluster.common as common
 
 # Deal with the 'relations.hacluster.common' import in requires.py which
 # is invalid in the unit tests as there is no 'relations'.
 relations_mock = mock.MagicMock()
-relations_mock.hacluster.common = common
+relations_mock.hacluster.interface_hacluster.common = common
 modules = {
     'relations': relations_mock,
     'relations.hacluster': mock.MagicMock(),
-    'relations.hacluster.common': common,
+    'relations.hacluster.interface_hacluster': mock.MagicMock(),
+    'relations.hacluster.interface_hacluster.common': common,
 }
 module_patcher = mock.patch.dict('sys.modules', modules)
 module_patcher.start()
@@ -36,7 +37,7 @@ with mock.patch('charmhelpers.core.hookenv.metadata') as _meta:
 _hook_args = {}
 
 TO_PATCH = [
-    'data_changed',
+    'rh_data_changed',
 ]
 
 
@@ -196,7 +197,7 @@ class TestHAClusterRequires(unittest.TestCase):
                 "res_neutron_haproxy": '  op monitor interval="5s"'},
             'json_resources': {"res_neutron_haproxy": "lsb:haproxy"}}
         self.jsonify(expected)
-        self.data_changed.return_value = True
+        self.rh_data_changed.return_value = True
         self.patch_kr('set_local')
         self.patch_kr('set_remote')
         self.cr.manage_resources(res)
@@ -209,7 +210,7 @@ class TestHAClusterRequires(unittest.TestCase):
                       op='monitor interval="5s"')
         res.init_services('haproxy')
         res.clone('cl_nova_haproxy', 'res_neutron_haproxy')
-        self.data_changed.return_value = False
+        self.rh_data_changed.return_value = False
         self.patch_kr('set_local')
         self.patch_kr('set_remote')
         self.cr.manage_resources(res)

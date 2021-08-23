@@ -13,7 +13,7 @@
 from unittest import mock
 import unittest
 
-import common
+import interface_hacluster.common as common
 
 
 class TestHAClusterCommonCRM(unittest.TestCase):
