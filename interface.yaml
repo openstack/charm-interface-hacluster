@@ -11,3 +11,6 @@ ignore:
   - 'tox.ini'
   - 'unit_tests'
   - '.zuul.yaml'
+  - 'setup.cfg'
+  - 'setup.py'
+  - '**/ops_ha_interface.py'
