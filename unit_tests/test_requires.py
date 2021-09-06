@@ -548,3 +548,43 @@ class TestHAClusterRequires(unittest.TestCase):
         self.mock_reactive_db()
         self.cr.add_systemd_service('mysql', 'telnetd')
         self.set_local.assert_called_once_with(resources=expected)
+
+    def test_colocate_old(self):
+        self.mock_reactive_db()
+        res = common.CRM()
+        res.colocation('ganesha_with_vip',
+                       'inf',
+                       'res_nfs_ganesha_nfs_ganesha',
+                       'grp_ganesha_vips')
+        self.assertEqual(
+            res['colocations']['ganesha_with_vip'],
+            'inf: res_nfs_ganesha_nfs_ganesha grp_ganesha_vips')
+
+    def test_colocation(self):
+        expected = {
+            'resources': {},
+            'delete_resources': [],
+            'resource_params': {},
+            'groups': {},
+            'ms': {},
+            'orders': {},
+            'colocations': {
+                'ganesha_with_vip':
+                    ('inf: res_nfs_ganesha_nfs_ganesha grp_ganesha_vips '
+                     'node-attribute=red-nodes')},
+            'clones': {},
+            'locations': {},
+            'init_services': [],
+            'systemd_services': []}
+        self.mock_reactive_db()
+        self.cr.add_colocation(
+            'ganesha_with_vip',
+            'inf',
+            ['res_nfs_ganesha_nfs_ganesha', 'grp_ganesha_vips'],
+            'red-nodes')
+        self.set_local.assert_called_once_with(resources=expected)
+        self.assertIsNotNone(
+            self._get_db_res('colocations').get('ganesha_with_vip'))
+        self.cr.remove_colocation('ganesha_with_vip')
+        self.assertIsNone(
+            self._get_db_res('colocations').get('ganesha_with_vip'))

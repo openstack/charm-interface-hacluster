@@ -260,6 +260,40 @@ class ResourceManagement():
             self.endpoint_type)
         self.delete_resource(res_key)
 
+    def add_colocation(self, name, score, colo_resources, node_attribute=None):
+        """Add a colocation directive
+
+        :param name: string - Name of colocation directive
+        :param score: string - ALWAYS, INFINITY, NEVER, NEGATIVE_INFINITY}. See
+                               CRM.colocation for more details
+        :param colo_resources: List[string] - List of resource names to
+                               colocate
+        :param node_attribute: Colocate resources on a set of nodes with this
+                               attribute and not necessarily on the same node.
+        """
+        node_config = {}
+        if node_attribute:
+            node_config = {
+                'node_attribute': node_attribute}
+        resource_dict = self.get_local('resources')
+        if resource_dict:
+            resources = CRM(**resource_dict)
+        else:
+            resources = CRM()
+        resources.colocation(
+            name,
+            score,
+            *colo_resources,
+            **node_config)
+        self.set_local(resources=resources)
+
+    def remove_colocation(self, name):
+        """Remove a colocation directive
+
+        :param name: string - Name of colocation directive
+        """
+        self.delete_resource(name)
+
     def get_remote_all(self, key, default=None):
         """Return a list of all values presented by remote units for key"""
         raise NotImplementedError
