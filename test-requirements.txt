@@ -4,3 +4,4 @@ stestr>=2.2.0
 charms.reactive
 coverage>=3.6
 netifaces
+git+https://github.com/canonical/operator.git#egg=ops
