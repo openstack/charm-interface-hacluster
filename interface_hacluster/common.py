@@ -84,7 +84,7 @@ class ResourceManagement():
         """
         relation_data = {
             'json_{}'.format(k): json.dumps(v, sort_keys=True)
-            for k, v in crm.items() if v
+            for k, v in crm.items()
         }
         if self.data_changed('hacluster-manage_resources', relation_data):
             self.set_local(**relation_data)
