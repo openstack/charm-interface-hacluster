@@ -14,7 +14,6 @@
 import hashlib
 import ipaddress
 import json
-from six import string_types
 
 
 class ResourceManagement():
@@ -415,7 +414,7 @@ class CRM(dict):
 
     def _parse(self, prefix, data):
         results = ''
-        if isinstance(data, string_types):
+        if isinstance(data, str):
             data = [data]
 
         first = True
@@ -740,7 +739,7 @@ class CRM(dict):
         # format the spec string with the attributes
         if 'attributes' in kwargs:
             attrs = kwargs['attributes']
-            if isinstance(attrs, string_types):
+            if isinstance(attrs, str):
                 attrs = [attrs]
             specs = specs + (' %s' % ' '.join(attrs))
 
