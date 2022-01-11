@@ -181,8 +181,7 @@ class TestHAClusterRequires(unittest.TestCase):
             sort_keys=True,
         )
         for k, v in options.items():
-            if v:
-                options[k] = json.dumps(v, **json_encode_options)
+            options[k] = json.dumps(v, **json_encode_options)
 
     def test_manage_resources(self):
         res = common.CRM()
@@ -195,7 +194,14 @@ class TestHAClusterRequires(unittest.TestCase):
             'json_init_services': ["haproxy"],
             'json_resource_params': {
                 "res_neutron_haproxy": '  op monitor interval="5s"'},
-            'json_resources': {"res_neutron_haproxy": "lsb:haproxy"}}
+            'json_resources': {"res_neutron_haproxy": "lsb:haproxy"},
+            'json_delete_resources': [],
+            'json_groups': {},
+            'json_ms': {},
+            'json_orders': {},
+            'json_colocations': {},
+            'json_locations': {},
+            'json_systemd_services': []}
         self.jsonify(expected)
         self.rh_data_changed.return_value = True
         self.patch_kr('set_local')
