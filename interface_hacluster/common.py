@@ -1000,9 +1000,20 @@ class SystemdService(ResourceDescriptor):
             self.systemd_service_name.replace('-', '_'))
         res_type = 'systemd:{}'.format(self.systemd_service_name)
         _meta = 'migration-threshold="INFINITY" failure-timeout="5s"'
-        crm.primitive(
-            res_key, res_type, op='monitor interval="5s"', meta=_meta)
-        crm.systemd_services(self.systemd_service_name)
+
         if self.clone:
+            crm.primitive(res_key, res_type, op='monitor interval="5s"',
+                          meta=_meta)
             clone_key = 'cl_{}'.format(res_key)
             crm.clone(clone_key, res_key)
+        else:
+            # When the requested resource is not a clone will mean we want it
+            # to run in a single node, so having 2 monitors allows pacemaker
+            # to actively check the service is running in the node it should,
+            # but also to check the service is NOT running in the node(s)
+            # where it shouldn't (LP: #1904623).
+            crm.primitive(res_key, res_type,
+                          op=['monitor interval="5s" role=Started',
+                              'monitor interval="6s" role=Stopped'],
+                          meta=_meta)
+        crm.systemd_services(self.systemd_service_name)
