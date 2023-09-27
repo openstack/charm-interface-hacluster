@@ -255,8 +255,8 @@ class ResourceManagement():
         :returns: None
         """
         res_key = 'res_{}_{}_hostname'.format(
-            self.service_name.replace('-', '_'),
-            self.endpoint_type)
+            name.replace('-', '_'),
+            endpoint_type)
         self.delete_resource(res_key)
 
     def add_colocation(self, name, score, colo_resources, node_attribute=None):
