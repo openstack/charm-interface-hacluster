@@ -522,7 +522,7 @@ class TestHAClusterRequires(unittest.TestCase):
             ['value1'])
         # Check multiple values:
         self.assertEqual(
-            self.cr.get_remote_all('key2'),
+            sorted(self.cr.get_remote_all('key2')),
             ['value2', 'value3'])
         # Check missing key
         self.assertEqual(

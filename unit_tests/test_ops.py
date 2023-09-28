@@ -123,8 +123,9 @@ requires:
             'hacluster-b/1',
             {'veg': 'carrot'})
         self.assertEqual(
-            self.harness.charm.ha.get_remote_all('fruit'),
-            ['orange', 'grape', 'banana'])
+            # sort for comparison because order is not guaranteed
+            sorted(self.harness.charm.ha.get_remote_all('fruit')),
+            ['banana', 'grape', 'orange'])
 
     def test_ha_ready(self):
         self.harness.begin()
